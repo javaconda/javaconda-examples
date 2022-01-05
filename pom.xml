@@ -10,7 +10,7 @@
 
 	<groupId>org.javaconda</groupId>
 	<artifactId>javaconda-examples</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.3.1-SNAPSHOT</version>
 
 	<name>Javaconda Examples</name>
 	<description>Javaconda example for running Cellpose</description>
@@ -94,9 +94,9 @@
 			<artifactId>imagej</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.elephant</groupId>
-		    <artifactId>javaconda</artifactId>
-		    <version>0.1.1-SNAPSHOT</version>
+			<groupId>org.javaconda</groupId>
+			<artifactId>javaconda</artifactId>
+			<version>0.3.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

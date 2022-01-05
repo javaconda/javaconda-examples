@@ -37,7 +37,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.elephant.conda.Conda;
+import org.javaconda.Conda;
 
 /**
  * This example illustrates how to install and run Cellpose using Javaconda.
@@ -47,7 +47,7 @@ public class Cellpose
 {
 
 	/**
-	 * This main function runs the following commands:
+	 * This main method runs the following commands:
 	 * <p>
 	 * <ul>
 	 * <li>Create a {@link Conda} instance</li>
@@ -68,34 +68,34 @@ public class Cellpose
 	 */
 	public static void main( final String... args ) throws IOException, InterruptedException
 	{
-		final String rootdir = Paths.get( System.getProperty( "user.home" ), "javaconda" ).toString();
-		final Conda conda = new Conda( rootdir );
+		final Conda conda = new Conda( "/mnt/md0/applications/javaconda" );
 		final String envName = "cellpose";
-		if ( !conda.getEnvs().contains( envName ) )
+		if ( !conda.getEnvironmentNames().contains( envName ) )
 		{
-			conda.runConda( "create", "-y", "--name", envName, "python=3.8" );
-			conda.runPython( envName, "-m", "pip", "install", "cellpose==0.7.2" );
-			conda.runPython( envName, "-m", "pip", "uninstall", "-y", "torch" );
-			conda.runConda( "install", "-y", "--name", envName, "pytorch", "cudatoolkit=10.2", "-c", "pytorch" );
+			conda.create( envName, "python=3.8" );
+			conda.activate( envName );
+			conda.pipInstall( "cellpose==0.7.2" );
+			conda.pipUninstall( "torch" );
+			conda.install( "pytorch", "cudatoolkit=10.2", "-c", "pytorch" );
 
 			// Fix the issue #378:
 			// https://github.com/MouseLand/cellpose/issues/378#issuecomment-976767543
 			if ( SystemUtils.IS_OS_WINDOWS )
-				if ( SystemUtils.IS_OS_WINDOWS )
-				{
-					final Path path = Paths.get( rootdir, "envs", "cellpose", "Lib", "site-packages", "cellpose", "dynamics.py" );
-					final List< String > lines = Files.readAllLines( path, StandardCharsets.UTF_8 );
-					lines.set( 103, "    meds = torch.from_numpy(centers.astype(int)).to(torch.long).to(device)" );
-					Files.write( path, lines, StandardCharsets.UTF_8 );
-				}
+			{
+				final Path path = Paths.get( conda.getRootdir(), "envs", "cellpose", "Lib", "site-packages", "cellpose", "dynamics.py" );
+				final List< String > lines = Files.readAllLines( path, StandardCharsets.UTF_8 );
+				lines.set( 103, "    meds = torch.from_numpy(centers.astype(int)).to(torch.long).to(device)" );
+				Files.write( path, lines, StandardCharsets.UTF_8 );
+			}
 		}
+		conda.activate( envName );
 		final File file = new File( "javaconda_workspace/cellpose/img02.png" );
 		FileUtils.copyURLToFile(
 				new URL( "http://www.cellpose.org/static/images/img02.png" ),
 				file,
 				10000,
 				10000 );
-		conda.runPython( envName, "-m", "cellpose", "--use_gpu", "--dir", file.getParentFile().getAbsolutePath(), "--pretrained_model", "cyto", "--chan", "2", "--chan2", "3", "--save_png" );
+		conda.runPython( "-m", "cellpose", "--use_gpu", "--dir", file.getParentFile().getAbsolutePath(), "--pretrained_model", "cyto", "--chan", "2", "--chan2", "3", "--save_png" );
 	}
 
 }
